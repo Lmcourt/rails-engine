@@ -126,4 +126,39 @@ describe 'Merchants API' do
       expect(response).to have_http_status(404)
     end
   end
+
+  describe 'all merchant items' do
+    it 'gets all merchant items' do
+      merchant = create(:merchant)
+      create_list(:item, 42, merchant_id: merchant.id)
+
+      get "/api/v1/merchants/#{merchant.id}/items"
+
+      expect(response).to be_successful
+
+      items = JSON.parse(response.body, symbolize_names: true)
+
+      expect(items[:data].count).to eq(42)
+      expect(items).to be_a(Hash)
+      expect(items[:data]).to be_a(Array)
+      expect(items[:data][0]).to have_key(:id)
+      expect(items[:data][0]).to have_key(:type)
+      expect(items[:data][0][:type]).to be_a(String)
+      expect(items[:data][0]).to have_key(:attributes)
+      expect(items[:data][0][:attributes]).to have_key(:name)
+      expect(items[:data][0][:attributes]).to have_key(:description)
+      expect(items[:data][0][:attributes]).to have_key(:unit_price)
+      expect(items[:data][0][:attributes][:name]).to be_a(String)
+    end
+
+    it 'returns 404 error if integer is not valid' do
+      merchant = create(:merchant)
+      create_list(:item, 42, merchant_id: merchant.id)
+
+      get "/api/v1/merchants/5/items"
+
+      expect(response).to_not be_successful
+      expect(response).to have_http_status(404)
+    end
+  end
 end
