@@ -117,5 +117,13 @@ describe 'Merchants API' do
       expect(merchant[:data][:attributes][:name]).to be_a String
       expect(merchant[:data][:attributes]).to have_key :name
     end
+
+    it 'sends 404 error if id is not valid integer' do
+      merchant = create(:merchant)
+      get "/api/v1/merchants/1"
+
+      expect(response).to_not be_successful
+      expect(response).to have_http_status(404)
+    end
   end
 end
