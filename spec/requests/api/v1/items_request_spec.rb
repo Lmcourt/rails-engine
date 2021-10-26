@@ -116,7 +116,7 @@ describe 'items API' do
     end
   end
 
-  describe 'creation' do
+  describe 'creating an item' do
     it 'can create a new item' do
       merchant = create(:merchant)
       item_params = ({
@@ -136,6 +136,96 @@ describe 'items API' do
       expect(created_item.description).to eq(item_params[:description])
       expect(created_item.unit_price).to eq(item_params[:unit_price])
       expect(created_item.merchant_id).to eq(item_params[:merchant_id])
+      expect(response).to have_http_status(201)
+
+    end
+
+    it 'returns an error if any attribute is missing' do
+      merchant = create(:merchant)
+      item_params = ({
+                    name: "new item",
+                    description: "its a really good item. You want this.",
+                    unit_price: 55.55,
+                    })
+      headers = {"CONTENT_TYPE" => "application/json"}
+
+      post '/api/v1/items', headers: headers, params: JSON.generate(item: item_params)
+
+      created_item = Item.last
+
+      expect(response).to_not be_successful
+    end
+
+    it 'ignores any attributes sent by the user which are not allowed' do
+      merchant = create(:merchant)
+      item_params = ({
+                    name: "new item",
+                    description: "its a really good item. You want this.",
+                    unit_price: 55.55,
+                    merchant_id: merchant.id,
+                    other: "not a real attribute"
+                    })
+      headers = {"CONTENT_TYPE" => "application/json"}
+
+      post '/api/v1/items', headers: headers, params: JSON.generate(item: item_params)
+
+      created_item = Item.last
+
+      expect(response).to be_successful
+      expect(created_item.name).to eq(item_params[:name])
+      expect(created_item.description).to eq(item_params[:description])
+      expect(created_item.unit_price).to eq(item_params[:unit_price])
+      expect(created_item.merchant_id).to eq(item_params[:merchant_id])
+    end
+  end
+
+  describe 'editing an item' do
+    it 'updates an existing item' do
+      merchant = create(:merchant)
+      item = create(:item, merchant_id: merchant.id)
+      previous_name = Item.last.name
+      item_params = { name: "This is the updated name" }
+      headers = { "CONTENT_TYPE" => "application/json" }
+
+      patch "/api/v1/items/#{item.id}", headers: headers, params: JSON.generate({item: item_params})
+      item = Item.find_by(id: item.id)
+
+      expect(response).to be_successful
+      expect(item.name).to_not eq(previous_name)
+      expect(item.name).to eq("This is the updated name")
+    end
+  end
+
+  describe 'destroys an item' do
+    it 'destroys an existing item' do
+      merchant = create(:merchant)
+      item = create(:item, merchant_id: merchant.id)
+
+      expect(Item.count).to eq(1)
+
+      delete "/api/v1/items/#{item.id}"
+
+      expect(response).to be_successful
+      expect(Item.count).to eq(0)
+      expect{Item.find(item.id)}.to raise_error(ActiveRecord::RecordNotFound)
+      expect(response).to have_http_status(204)
+    end
+  end
+
+  describe 'get the merchant data for a given item ID' do
+    it 'finds a merchant by item ID' do
+      merch = create(:merchant)
+      item = create(:item, merchant_id: merch.id)
+
+      get "/api/v1/items/#{item.id}/merchant"
+
+      expect(response).to be_successful
+
+      merchant = JSON.parse(response.body, symbolize_names: true)
+
+      expect(merchant[:data][:attributes]).to have_key(:name)
+      expect(merchant[:data][:id].to_i).to eq(merch.id)
+      expect(response).to have_http_status(200)
     end
   end
 end
