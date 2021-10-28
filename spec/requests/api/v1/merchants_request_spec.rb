@@ -72,11 +72,13 @@ describe 'Merchants API' do
       expect(fifty_merchants[:data].count).to eq(20)
       expect(fifty_merchants).to be_a(Hash)
       expect(fifty_merchants[:data]).to be_a(Array)
-      expect(fifty_merchants[:data][0]).to have_key(:id)
-      expect(fifty_merchants[:data][0]).to have_key(:type)
-      expect(fifty_merchants[:data][0][:type]).to eq("merchant")
-      expect(fifty_merchants[:data][0][:attributes][:name]).to be_a String
-      expect(fifty_merchants[:data][0][:attributes]).to have_key :name
+
+      get '/api/v1/merchants?page=-5'
+      expect(response).to be_successful
+
+      fifty_merchants = JSON.parse(response.body, symbolize_names: true)
+      expect(fifty_merchants[:data].count).to eq(20)
+
     end
 
     it 'always return an array of data, even if one or zero resources are found' do
@@ -89,13 +91,7 @@ describe 'Merchants API' do
       fifty_merchants = JSON.parse(response.body, symbolize_names: true)
 
       expect(fifty_merchants[:data].count).to eq(1)
-      expect(fifty_merchants).to be_a(Hash)
       expect(fifty_merchants[:data]).to be_a(Array)
-      expect(fifty_merchants[:data][0]).to have_key(:id)
-      expect(fifty_merchants[:data][0]).to have_key(:type)
-      expect(fifty_merchants[:data][0][:type]).to eq("merchant")
-      expect(fifty_merchants[:data][0][:attributes][:name]).to be_a String
-      expect(fifty_merchants[:data][0][:attributes]).to have_key :name
     end
   end
 
