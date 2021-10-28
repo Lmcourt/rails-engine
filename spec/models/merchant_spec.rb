@@ -5,7 +5,7 @@ RSpec.describe Merchant do
   describe 'relationships' do
     it { should have_many(:items) }
     it { should have_many(:invoice_items).through(:items)}
-    it { should have_many(:invoices).through(:invoice_items)}
+    it { should have_many(:invoices) }
     it { should have_many(:customers).through(:invoices)}
     it { should have_many(:transactions).through(:invoices)}
   end
@@ -26,10 +26,10 @@ RSpec.describe Merchant do
       @customer_3 = Customer.create!(first_name: 'Mariah', last_name: 'Carrey')
       @customer_4 = Customer.create!(first_name: 'Leigh Ann', last_name: 'Bron')
 
-      @invoice_1 = Invoice.create!(customer_id: @customer_1.id, status: 'shipped')
-      @invoice_2 = Invoice.create!(customer_id: @customer_2.id, status: 'shipped')
-      @invoice_3 = Invoice.create!(customer_id: @customer_3.id, status: 'shipped')
-      @invoice_4 = Invoice.create!(customer_id: @customer_4.id, status: 'shipped')
+      @invoice_1 = Invoice.create!(merchant_id: @merchant1.id, customer_id: @customer_1.id, status: 'shipped')
+      @invoice_2 = @merchant2.invoices.create!(customer_id: @customer_2.id, status: 'shipped')
+      @invoice_3 = @merchant3.invoices.create!(customer_id: @customer_3.id, status: 'shipped')
+      @invoice_4 = @merchant4.invoices.create!(customer_id: @customer_4.id, status: 'shipped')
 
       @ii_1 = InvoiceItem.create!(invoice_id: @invoice_1.id, item_id: @item_1.id, quantity: 1, unit_price: 1, created_at: "2012-03-27 14:54:09")
       @ii_2 = InvoiceItem.create!(invoice_id: @invoice_2.id, item_id: @item_2.id, quantity: 1, unit_price: 2, created_at: "2012-03-29 14:54:09")
@@ -48,7 +48,9 @@ RSpec.describe Merchant do
     end
 
     it 'finds a specific merchants revenue' do
-      expect(Merchant.merchant_total_revenue(@merchant1)).to eq(1)
+      # result = @merchant1.merchant_total_revenue
+      # require "pry"; binding.pry
+      expect(Merchant.merchant_total_revenue(@merchant1.id).revenue).to eq(1)
     end
   end
 end
