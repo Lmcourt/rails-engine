@@ -17,7 +17,7 @@ class Merchant < ApplicationRecord
 
   def self.merchant_total_revenue(merch)
     joins(invoices: :transactions)
-    .where('merchants.id = ? AND transactions.result = ?', merch, 'success')
+    .where('merchants.id = ? AND result = ?', merch, 'success')
     .select('merchants.*, sum(invoice_items.quantity * invoice_items.unit_price) AS revenue')
     .group(:id)
     .first
