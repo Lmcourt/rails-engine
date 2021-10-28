@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe 'items API' do
   describe 'all items' do
-    it 'can find all items with 20 per page' do
+    it 'can find all items page 1 with 20 per page' do
       merchant = create(:merchant)
       create_list(:item, 50, merchant_id: merchant.id)
 
@@ -25,7 +25,7 @@ describe 'items API' do
       expect(twenty_items[:data][0][:attributes]).to have_key :merchant_id
     end
 
-    it 'can find all items with 50 per page' do
+    it 'can find all items page 1 with 50 per page' do
       merchant = create(:merchant)
       create_list(:item, 110, merchant_id: merchant.id)
 
@@ -154,6 +154,7 @@ describe 'items API' do
       created_item = Item.last
 
       expect(response).to_not be_successful
+      expect(response).to have_http_status(422)
     end
 
     it 'ignores any attributes sent by the user which are not allowed' do
