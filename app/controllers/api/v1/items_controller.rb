@@ -15,12 +15,13 @@ class Api::V1::ItemsController < ApplicationController
   end
 
   def update
+    validate_merchant
     item = Item.update(params[:id], item_params)
     render json: ItemSerializer.new(item)
   end
 
   def destroy
-    item = Item.destroy(params[:id])
+    item = Item.find(params[:id]).destroy!
   end
 
   private
@@ -35,5 +36,12 @@ class Api::V1::ItemsController < ApplicationController
 
   def item_params
     params.require(:item).permit(:name, :description, :unit_price, :merchant_id)
+  end
+
+  def validate_merchant
+    if params[:merchant_id]
+      merchant = Merchant.find_by(id: params[:merchant_id])
+      raise ActionController::BadRequest unless merchant
+    end
   end
 end
