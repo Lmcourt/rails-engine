@@ -37,6 +37,10 @@ group :development, :test do
   gem 'faker'
   gem 'pry'
   gem 'simplecov'
+  gem 'shoulda-matchers', '~> 5.0'
+  gem 'capybara'
+  gem 'launchy'
+  gem 'orderly'
 end
 
 group :development do
