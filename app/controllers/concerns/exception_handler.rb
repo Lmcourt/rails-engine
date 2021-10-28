@@ -3,11 +3,23 @@ module ExceptionHandler
 
   included do
     rescue_from ActiveRecord::RecordNotFound do |e|
-      json_response({ message: e.message }, :not_found)
+      render json: { message: e.message, errors: 'Record not found' }, status: :not_found
     end
 
     rescue_from ActiveRecord::RecordInvalid do |e|
-      json_response({ message: e.message }, :unprocessable_entity)
+    render json: { message: e.message, errors: 'Invalid parameters' }, status: :unprocessable_entity
+    end
+
+    rescue_from ActiveRecord::RecordNotDestroyed do |e|
+      render json: { errors: e.record.errors }, status: :unprocessable_entity
+    end
+
+    rescue_from ActionController::ParameterMissing do |e|
+      render json: { errors: 'Missing parameters' }, status: :unprocessable_entity
+    end
+
+    rescue_from ActionController::BadRequest do |e|
+      render json: { errors: 'Invalid parameters' }, status: 400
     end
   end
 end
