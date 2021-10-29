@@ -22,7 +22,7 @@ class Merchant < ApplicationRecord
   end
 
   def self.most_items(quantity = 5)
-    joins(invoices: :transactions)
+    joins(invoices: [:transactions, :invoice_items])
     .where('result = ?', 'success')
     .select('merchants.*, sum(invoice_items.quantity) AS count')
     .group(:id)
