@@ -16,11 +16,9 @@ class Merchant < ApplicationRecord
   end
 
   def merchant_total_revenue
-    joins(invoices: :transactions)
-    .where('merchants.id = ? AND result = ?', merch, 'success')
-    .select('merchants.*, sum(invoice_items.quantity * invoice_items.unit_price) AS revenue')
-    .group(:id)
-    .first
+    invoice_items.joins(invoice: :transactions)
+    .where('result = ?', 'success')
+    .sum('invoice_items.quantity * invoice_items.unit_price')
   end
 
   def self.most_items(quantity = 5)
