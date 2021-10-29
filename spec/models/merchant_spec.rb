@@ -47,10 +47,10 @@ RSpec.describe Merchant do
       expect(Merchant.ordered_total_revenue(4)).to eq([@merchant4, @merchant3, @merchant2, @merchant1])
     end
 
-    xit 'finds a specific merchants revenue' do
+    it 'finds a specific merchants revenue' do
       # result = @merchant1.merchant_total_revenue
       # require "pry"; binding.pry
-      expect(Merchant.merchant_total_revenue(@merchant1.id).revenue).to eq(1)
+      expect(@merchant1.merchant_total_revenue).to eq(1)
     end
   end
 end
