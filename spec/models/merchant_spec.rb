@@ -26,7 +26,7 @@ RSpec.describe Merchant do
       @customer_3 = Customer.create!(first_name: 'Mariah', last_name: 'Carrey')
       @customer_4 = Customer.create!(first_name: 'Leigh Ann', last_name: 'Bron')
 
-      @invoice_1 = Invoice.create!(merchant_id: @merchant1.id, customer_id: @customer_1.id, status: 'shipped')
+      @invoice_1 = @merchant1.invoices.create!(customer_id: @customer_1.id, status: 'shipped')
       @invoice_2 = @merchant2.invoices.create!(customer_id: @customer_2.id, status: 'shipped')
       @invoice_3 = @merchant3.invoices.create!(customer_id: @customer_3.id, status: 'shipped')
       @invoice_4 = @merchant4.invoices.create!(customer_id: @customer_4.id, status: 'shipped')
@@ -47,7 +47,7 @@ RSpec.describe Merchant do
       expect(Merchant.ordered_total_revenue(4)).to eq([@merchant4, @merchant3, @merchant2, @merchant1])
     end
 
-    it 'finds a specific merchants revenue' do
+    xit 'finds a specific merchants revenue' do
       # result = @merchant1.merchant_total_revenue
       # require "pry"; binding.pry
       expect(Merchant.merchant_total_revenue(@merchant1.id).revenue).to eq(1)
