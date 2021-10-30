@@ -9,7 +9,7 @@ class Api::V1::Revenue::MerchantsController < ApplicationController
 
   def merchant_revenue
     validate_merchant
-    merchant = Merchant.merchant_total_revenue(params[:merchant_id])
+    merchant = Merchant.find(params[:merchant_id])
     render json: MerchantRevenueSerializer.new(merchant)
   end
 
